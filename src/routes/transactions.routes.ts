@@ -13,28 +13,9 @@ const transactionsRouter = Router();
 
 transactionsRouter.get('/', async (request, response) => {
   const transactionRepository = getCustomRepository(TransactionsRepository);
-  // const transactions = await transactionRepository.find();
-  const transactionsFromDB = await getCustomRepository(TransactionsRepository)
-    .createQueryBuilder('transaction')
-    .leftJoinAndSelect(
-      'transaction.category',
-      'category',
-      'category.id = transaction.category_id',
-    )
-    .getMany();
 
+  const transactions = await transactionRepository.find();
   const balance = await transactionRepository.getBalance();
-
-  const transactions = transactionsFromDB.map(t => {
-    const transaction = t;
-    delete transaction.createdAt;
-    delete transaction.updatedAt;
-    delete transaction.categoryId;
-    delete transaction.category.createdAt;
-    delete transaction.category.updatedAt;
-
-    return transaction;
-  });
 
   response.json({ transactions, balance });
 });
